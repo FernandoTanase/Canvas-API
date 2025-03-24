@@ -4,7 +4,12 @@
   "version": "1.0",
   "description": "A Chrome extension for interacting with the Canvas API used by universities.",
   "permissions": [
-    "activeTab"
+    "activeTab",
+    "storage",
+    "scripting"
+  ],
+  "host_permissions": [
+    "*://*.instructure.com/*"
   ],
   "action": {
     "default_popup": "popup/popup.html",

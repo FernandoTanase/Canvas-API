@@ -1,12 +1,33 @@
 body {
     font-family: Arial, sans-serif;
-    width: 300px;
+    width: 350px;
     padding: 10px;
 }
 
 h1 {
     font-size: 20px;
     margin-bottom: 10px;
+}
+
+h2 {
+    font-size: 16px;
+    margin-top: 15px;
+    margin-bottom: 10px;
+}
+
+input[type="text"], select {
+    width: 100%;
+    padding: 8px;
+    margin: 5px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+input[type="file"] {
+    margin: 10px 0;
+    width: 100%;
 }
 
 button {
@@ -21,16 +42,45 @@ button {
     margin: 4px 2px;
     cursor: pointer;
     border-radius: 5px;
+    width: 100%;
 }
 
-button:hover {
+button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+button:hover:not(:disabled) {
     background-color: #45a049;
 }
 
 .close-button {
     background-color: #f44336;
+    margin-top: 15px;
 }
 
 .close-button:hover {
     background-color: #e53935;
+}
+
+#status-message {
+    margin-top: 10px;
+    padding: 8px;
+    border-radius: 4px;
+}
+
+.error {
+    background-color: #ffebee;
+    color: #c62828;
+}
+
+.success {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
+
+#auth-section, #upload-section {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+    margin-bottom: 15px;
 }
