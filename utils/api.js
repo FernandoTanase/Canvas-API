@@ -22,7 +22,7 @@ class CanvasAPI {
 
     async getCourses() {
         try {
-            const response = await this.fetchWithAuth(`${this.baseUrl}/courses?enrollment_state=active&per_page=100`);
+            const response = await this.fetchWithAuth(`${this.baseUrl}/courses?state[]=available&enrollment_state=active&per_page=100`);
             return await response.json();
         } catch (error) {
             console.error('Error fetching courses:', error);
