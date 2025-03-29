@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const uploadButton = document.getElementById('upload-button');
     const statusMessage = document.getElementById('status-message');
     const uploadedImage = document.getElementById('uploaded-image');
+    const viewPhotoButton = document.getElementById('view-photo-button');
 
     let canvasApi = null;
     let uploadedFileUrl = null; // Variable to store the file URL
@@ -138,11 +139,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Display image in the View Photo tab when clicked
-    document.querySelector('[data-tab="view-tab"]').addEventListener('click', function() {
+    viewPhotoButton.addEventListener('click', function() {
+        console.log("View photo clicked!"); // Debugging line
         if (uploadedFileUrl) {
             uploadedImage.src = uploadedFileUrl; // Show the uploaded image
-            uploadedImage.style.display = 'block'; // Make sure it is visible
+            uploadedImage.style.display = 'block'; // Make sure the image is visible
+        } else {
+            showStatus('No image uploaded yet', 'error');
         }
     });
 
