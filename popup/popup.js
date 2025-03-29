@@ -128,7 +128,7 @@ document.addEventListener('DOMContentLoaded', function() {
             showStatus('Upload failed: ' + error.message, 'error');
             uploadButton.disabled = false;
         }
-        try {
+        /*try {
             uploadButton.disabled = true;
             showStatus('Uploading file...', 'info');
     
@@ -154,7 +154,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Upload error:', error);
             showStatus('Upload failed: ' + error.message, 'error');
             uploadButton.disabled = false;
-        }
+        }*/
     });
 
     // Display status messages
