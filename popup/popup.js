@@ -82,6 +82,18 @@ document.addEventListener('DOMContentLoaded', function() {
     courseSelect.addEventListener('change', updateUploadButtonState);
     fileInput.addEventListener('change', updateUploadButtonState);
 
+    // Show image preview when a file is selected
+    fileInput.addEventListener('change', function() {
+        const file = fileInput.files[0];
+        if (file && file.type.startsWith('image/')) {
+            const imageUrl = URL.createObjectURL(file);
+            uploadedImage.src = imageUrl;
+            uploadedImage.style.display = 'block'; // Show the image preview
+        } else {
+            uploadedImage.style.display = 'none'; // Hide the image preview if not an image
+        }
+    });
+
     // Tab functionality
     document.querySelectorAll('.tab-button').forEach(button => {
         button.addEventListener('click', () => {
