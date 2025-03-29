@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const fileInput = document.getElementById('file-input');
     const uploadButton = document.getElementById('upload-button');
     const statusMessage = document.getElementById('status-message');
+    const uploadedImage = document.getElementById('uploaded-image');
 
     let canvasApi = null;
     
@@ -80,6 +81,7 @@ document.addEventListener('DOMContentLoaded', function() {
     courseSelect.addEventListener('change', updateUploadButtonState);
     fileInput.addEventListener('change', updateUploadButtonState);
 
+    // Tab functionality
     document.querySelectorAll('.tab-button').forEach(button => {
         button.addEventListener('click', () => {
             const target = button.getAttribute('data-tab');
@@ -122,29 +124,11 @@ document.addEventListener('DOMContentLoaded', function() {
             showStatus('File uploaded successfully!', 'success');
             fileInput.value = ''; // Clear file input
             updateUploadButtonState();
-        } 
-        catch (error) {
-            console.error('Upload error:', error);
-            showStatus('Upload failed: ' + error.message, 'error');
-            uploadButton.disabled = false;
-        }
-        /*try {
-            uploadButton.disabled = true;
-            showStatus('Uploading file...', 'info');
-    
-            const result = await canvasApi.uploadFile(courseId, file, (progress) => {
-                showStatus(`Uploading: ${Math.round(progress)}%`, 'info');
-            });
-    
-            showStatus('File uploaded successfully!', 'success');
-            fileInput.value = ''; // Clear file input
-            updateUploadButtonState();
     
             // Try to display the image (if it's an image)
             if (file.type.startsWith('image/')) {
-                const imgEl = document.getElementById('uploaded-image');
-                imgEl.src = URL.createObjectURL(file); // local preview
-                imgEl.style.display = 'block';
+                uploadedImage.src = URL.createObjectURL(file); // local preview
+                uploadedImage.style.display = 'block';
     
                 // Switch to view tab
                 document.querySelector('[data-tab="view-tab"]').click();
@@ -154,7 +138,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Upload error:', error);
             showStatus('Upload failed: ' + error.message, 'error');
             uploadButton.disabled = false;
-        }*/
+        }
     });
 
     // Display status messages
