@@ -80,6 +80,22 @@ document.addEventListener('DOMContentLoaded', function() {
     courseSelect.addEventListener('change', updateUploadButtonState);
     fileInput.addEventListener('change', updateUploadButtonState);
 
+    document.querySelectorAll('.tab-button').forEach(button => {
+        button.addEventListener('click', () => {
+            const target = button.getAttribute('data-tab');
+    
+            // Set tab content
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.getElementById(target).classList.add('active');
+    
+            // Set tab button active
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+        });
+    });
+
     // Handle file upload
     uploadButton.addEventListener('click', async function() {
         if (!canvasApi) {
@@ -106,6 +122,33 @@ document.addEventListener('DOMContentLoaded', function() {
             showStatus('File uploaded successfully!', 'success');
             fileInput.value = ''; // Clear file input
             updateUploadButtonState();
+        } catch (error) {
+            console.error('Upload error:', error);
+            showStatus('Upload failed: ' + error.message, 'error');
+            uploadButton.disabled = false;
+        }
+        try {
+            uploadButton.disabled = true;
+            showStatus('Uploading file...', 'info');
+    
+            const result = await canvasApi.uploadFile(courseId, file, (progress) => {
+                showStatus(`Uploading: ${Math.round(progress)}%`, 'info');
+            });
+    
+            showStatus('File uploaded successfully!', 'success');
+            fileInput.value = ''; // Clear file input
+            updateUploadButtonState();
+    
+            // Try to display the image (if it's an image)
+            if (file.type.startsWith('image/')) {
+                const imgEl = document.getElementById('uploaded-image');
+                imgEl.src = URL.createObjectURL(file); // local preview
+                imgEl.style.display = 'block';
+    
+                // Switch to view tab
+                document.querySelector('[data-tab="view-tab"]').click();
+            }
+    
         } catch (error) {
             console.error('Upload error:', error);
             showStatus('Upload failed: ' + error.message, 'error');
