@@ -104,31 +104,32 @@ document.addEventListener('DOMContentLoaded', function() {
             showStatus('Please set up API credentials first', 'error');
             return;
         }
-        
+    
         const courseId = courseSelect.value;
         const file = fileInput.files[0];
-        
+    
         if (!courseId || !file) {
             showStatus('Please select a course and a file', 'error');
             return;
         }
-        
+    
         try {
             uploadButton.disabled = true;
             showStatus('Uploading file...', 'info');
-            
+    
             const result = await canvasApi.uploadFile(courseId, file, (progress) => {
                 showStatus(`Uploading: ${Math.round(progress)}%`, 'info');
             });
-            
+    
             showStatus('File uploaded successfully!', 'success');
             fileInput.value = ''; // Clear file input
             updateUploadButtonState();
     
             // Try to display the image (if it's an image)
             if (file.type.startsWith('image/')) {
-                uploadedImage.src = URL.createObjectURL(file); // local preview
-                uploadedImage.style.display = 'block';
+                const imgEl = document.getElementById('uploaded-image');
+                imgEl.src = URL.createObjectURL(file); // Local preview
+                imgEl.style.display = 'block'; // Show the image
     
                 // Switch to view tab
                 document.querySelector('[data-tab="view-tab"]').click();
@@ -139,15 +140,5 @@ document.addEventListener('DOMContentLoaded', function() {
             showStatus('Upload failed: ' + error.message, 'error');
             uploadButton.disabled = false;
         }
-    });
-
-    // Display status messages
-    function showStatus(message, type) {
-        statusMessage.textContent = message;
-        statusMessage.className = type || '';
-    }
-
-    closeButton.addEventListener('click', function() {
-        window.close();
     });
 });
