@@ -122,7 +122,8 @@ document.addEventListener('DOMContentLoaded', function() {
             showStatus('File uploaded successfully!', 'success');
             fileInput.value = ''; // Clear file input
             updateUploadButtonState();
-        } catch (error) {
+        } 
+        catch (error) {
             console.error('Upload error:', error);
             showStatus('Upload failed: ' + error.message, 'error');
             uploadButton.disabled = false;
