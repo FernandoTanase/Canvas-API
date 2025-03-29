@@ -25,7 +25,7 @@ class CanvasAPI {
   async getCourses() {
     try {
       const response = await this.fetchWithAuth(
-        `${this.baseUrl}/courses?state[]=available&enrollment_state=active&per_page=100`
+        `${this.baseUrl}/users/self/favorites/courses?enrollment_state=active&per_page=100`
       );
       return await response.json();
     } catch (error) {
