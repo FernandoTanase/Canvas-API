@@ -1,0 +1,12 @@
+main {
+  display: grid;
+  place-items: center;
+}
+
+button:hover {
+  cursor: pointer;
+}
+
+button {
+  margin: 5px;
+}
