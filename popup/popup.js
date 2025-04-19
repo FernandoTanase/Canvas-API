@@ -7,9 +7,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const fileInput = document.getElementById('file-input');
     const uploadButton = document.getElementById('upload-button');
     const statusMessage = document.getElementById('status-message');
+    const uploadedImage = document.getElementById('uploaded-image');
 
     let canvasApi = null;
-    
+    let uploadedFileUrl = null; // Variable to store the file URL
+
     // Load saved settings
     chrome.storage.sync.get(['apiToken', 'canvasDomain'], function(items) {
         if (items.apiToken && items.canvasDomain) {
@@ -80,6 +82,35 @@ document.addEventListener('DOMContentLoaded', function() {
     courseSelect.addEventListener('change', updateUploadButtonState);
     fileInput.addEventListener('change', updateUploadButtonState);
 
+    // Show image preview when a file is selected
+    fileInput.addEventListener('change', function() {
+        const file = fileInput.files[0];
+        if (file && file.type.startsWith('image/')) {
+            const imageUrl = URL.createObjectURL(file);
+            uploadedImage.src = imageUrl;
+            uploadedImage.style.display = 'block'; // Show the image preview
+        } else {
+            uploadedImage.style.display = 'none'; // Hide the image preview if not an image
+        }
+    });
+
+    // Tab functionality
+    document.querySelectorAll('.tab-button').forEach(button => {
+        button.addEventListener('click', () => {
+            const target = button.getAttribute('data-tab');
+    
+            // Set tab content
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.getElementById(target).classList.add('active');
+    
+            // Set tab button active
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+        });
+    });
+
     // Handle file upload
     uploadButton.addEventListener('click', async function() {
         if (!canvasApi) {
@@ -106,10 +137,24 @@ document.addEventListener('DOMContentLoaded', function() {
             showStatus('File uploaded successfully!', 'success');
             fileInput.value = ''; // Clear file input
             updateUploadButtonState();
+
+            // Store the file URL (do not display it yet)
+            if (file.type.startsWith('image/')) {
+                uploadedFileUrl = URL.createObjectURL(file);
+            }
+    
         } catch (error) {
             console.error('Upload error:', error);
             showStatus('Upload failed: ' + error.message, 'error');
             uploadButton.disabled = false;
+        }
+    });
+
+    // Display image in the View Photo tab when clicked
+    document.querySelector('[data-tab="view-tab"]').addEventListener('click', function() {
+        if (uploadedFileUrl) {
+            uploadedImage.src = uploadedFileUrl; // Show the uploaded image
+            uploadedImage.style.display = 'block'; // Make sure it is visible
         }
     });
 

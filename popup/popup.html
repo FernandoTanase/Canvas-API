@@ -9,27 +9,41 @@
 <body>
     <div id="popup-container">
         <h1>Canvas API Extension</h1>
+
+        <!-- Upload Tab -->
+        <div id="upload-tab" class="tab-content active">
+            <div id="auth-section">
+                <input type="text" id="api-token" placeholder="Canvas API Token">
+                <input type="text" id="canvas-domain" placeholder="Canvas Domain (e.g., university.instructure.com)">
+                <button id="save-settings">Save Settings</button>
+            </div>
         
-        <div id="auth-section">
-            <input type="text" id="api-token" placeholder="Canvas API Token">
-            <input type="text" id="canvas-domain" placeholder="Canvas Domain (e.g., university.instructure.com)">
-            <button id="save-settings">Save Settings</button>
+            <div id="upload-section">
+                <h2>Upload Photo</h2>
+                <select id="course-select">
+                    <option value="">Select a course</option>
+                </select>
+                <input type="file" id="file-input" accept="image/*">
+                <!-- Only one upload button here -->
+                <button id="upload-button" disabled>Upload Photo</button>
+            </div>
         </div>
-        
-        <div id="upload-section">
-            <h2>Upload Photo</h2>
-            <select id="course-select">
-                <option value="">Select a course</option>
-            </select>
-            <input type="file" id="file-input" accept="image/*">
-            <button id="upload-button" disabled>Upload Photo</button>
-        </div>
-        
+
         <div id="status-message"></div>
-        
         <button id="close-button" class="close-button">Close</button>
     </div>
+    
+        <!-- View Tab -->
+        <div id="view-tab" class="tab-content">
+            <button class="tab-button" data-tab="view-tab">View Photo</button>
+            <h2>Uploaded Photo</h2>
+            <img id="uploaded-image" src="" alt="No photo uploaded yet" style="max-width: 100%; display: none;" />
+        </div>
+
+       
+
     <script src="../utils/api.js"></script>
     <script src="popup.js"></script>
 </body>
+
 </html>
