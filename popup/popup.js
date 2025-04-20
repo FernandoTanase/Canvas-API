@@ -165,32 +165,32 @@ document.addEventListener('DOMContentLoaded', function() {
       const fileType = uploadedFile.type; //get type of uploaded file
     
       if(fileType.startsWith('image/')) { //images
-        const img = document.createElement('img');
-        img.src = URL.createObjectURL(uploadedFile);
-        img.alt = uploadedFile.name;
-        img.style.maxWidth = '100%';
-        viewTabContent.appendChild(img);
+        const img = document.createElement('img'); //create element in memory
+        img.src = URL.createObjectURL(uploadedFile); //set source to temp. local URL of uploaded file
+        img.alt = uploadedFile.name; //alt. text if image cannot/does not load
+        img.style.maxWidth = '100%'; //size image for container
+        viewTabContent.appendChild(img); //add image to page(i.e. display it in extension)
     
       }
        else if(uploadedFile.name.toLowerCase().endsWith('.pdf')) { //pdfs
         const obj = document.createElement('object');
         obj.data = URL.createObjectURL(uploadedFile);
-        obj.type = 'application/pdf';
+        obj.type = 'application/pdf'; //specify object type for browser viewer
         obj.width = '100%';
-        obj.height = '500px';
+        obj.height = '500px'; 
         viewTabContent.appendChild(obj);
     
       } 
       else if(fileType.startsWith('video/')) { //videos
         const video = document.createElement('video');
-        video.controls = true;
+        video.controls = true; //enable playback controls 
         video.width = 320;
         video.height = 240;
         video.src = URL.createObjectURL(uploadedFile);
         viewTabContent.appendChild(video);
     
       } 
-      else { //file type not compatible with browser preview
+      else { //file type not compatible with browser viewer, preview not available
         viewTabContent.innerHTML += '<p>Preview not available for this file type.</p>';
       }
 
