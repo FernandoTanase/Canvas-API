@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const uploadedImage = document.getElementById('uploaded-image');
 
     let canvasApi = null;
-    let uploadedFileUrl = null; // Variable to store the file URL
+    let uploadedFile = null; 
 
     // Load saved settings
     chrome.storage.sync.get(['apiToken', 'canvasDomain'], function(items) {
@@ -138,10 +138,8 @@ document.addEventListener('DOMContentLoaded', function() {
             fileInput.value = ''; // Clear file input
             updateUploadButtonState();
 
-            // Store the file URL (do not display it yet)
-            if (file.type.startsWith('image/')) {
-                uploadedFileUrl = URL.createObjectURL(file);
-            }
+            // Store the file
+            uploadedFile = file;
     
         } catch (error) {
             console.error('Upload error:', error);
@@ -150,14 +148,54 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Display image in the View Photo tab when clicked
-    document.querySelector('[data-tab="view-tab"]').addEventListener('click', function() {
-        if (uploadedFileUrl) {
-            uploadedImage.src = uploadedFileUrl; // Show the uploaded image
-            uploadedImage.style.display = 'block'; // Make sure it is visible
-        }
-    });
+    // Display File preview in the View File tab 
+    const viewTabContent = document.getElementById('view-tab-content');
+    
+    fileInput.addEventListener('change', function (event) {
+      uploadedFile = event.target.files[0];
+    
+      // Clear previous preview
+      viewTabContent.innerHTML = '<h2>Uploaded File</h2>';
+    
+      if(!uploadedFile) { //check if a file has been uploaded
+        viewTabContent.innerHTML += '<p>No file has been uploaded yet.</p>';
+        return;
+      }
+    
+      const fileType = uploadedFile.type; //get type of uploaded file
+    
+      if(fileType.startsWith('image/')) { //images
+        const img = document.createElement('img');
+        img.src = URL.createObjectURL(uploadedFile);
+        img.alt = uploadedFile.name;
+        img.style.maxWidth = '100%';
+        viewTabContent.appendChild(img);
+    
+      }
+       else if(uploadedFile.name.toLowerCase().endsWith('.pdf')) { //pdfs
+        const obj = document.createElement('object');
+        obj.data = URL.createObjectURL(uploadedFile);
+        obj.type = 'application/pdf';
+        obj.width = '100%';
+        obj.height = '500px';
+        viewTabContent.appendChild(obj);
+    
+      } 
+      else if(fileType.startsWith('video/')) { //videos
+        const video = document.createElement('video');
+        video.controls = true;
+        video.width = 320;
+        video.height = 240;
+        video.src = URL.createObjectURL(uploadedFile);
+        viewTabContent.appendChild(video);
+    
+      } 
+      else { //file type not compatible with browser preview
+        viewTabContent.innerHTML += '<p>Preview not available for this file type.</p>';
+      }
 
+    });
+     
     // Display status messages
     function showStatus(message, type) {
         statusMessage.textContent = message;
