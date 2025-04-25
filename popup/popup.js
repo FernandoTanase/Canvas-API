@@ -65,6 +65,100 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+        const clientId = "42d4bf53-30f7-4522-ba5e-83a5dff792d6";
+        const tenantId = "2b30530b-69b6-4457-b818-481cb53d42ae";
+        const sharepointSite = "luky.sharepoint.com";
+        const sitePath = "/sites/CS498T1";
+
+        let accessToken = "";
+        let siteId = "";
+        let driveId = "";
+
+        const msalConfig = {
+            auth: {
+                clientId,
+                authority: `https://login.microsoftonline.com/${tenantId}`
+            }
+        };
+
+        async function signIn() {
+            try {
+                const result = await msalInstance.loginPopup({
+                    scopes: ["Files.ReadWrite.All", "Sites.ReadWrite.All"]
+                });
+                const token = await msalInstance.acquireTokenSilent({
+                    scopes: ["Files.ReadWrite.All", "Sites.ReadWrite.All"],
+                    account: result.account
+                });
+
+                accessToken = token.accessToken;
+                document.getElementById("status").innerText = "✅ Logged in!";
+                await getSiteAndDriveIds();
+            } catch (err) {
+                console.error("Login error:", err);
+                document.getElementById("status").innerText = "❌ Login failed.";
+            }
+        }
+
+        async function getSiteAndDriveIds() {
+            const headers = { Authorization: `Bearer ${accessToken}` };
+            const siteResp = await fetch(`https://graph.microsoft.com/v1.0/sites/${sharepointSite}:${sitePath}`, { headers });
+            siteId = (await siteResp.json()).id;
+
+            const driveResp = await fetch(`https://graph.microsoft.com/v1.0/sites/${siteId}/drive`, { headers });
+            driveId = (await driveResp.json()).id;
+        }
+
+        async function uploadToSharePoint() {
+            const file = document.getElementById("fileInput").files[0];
+            const folderName = document.getElementById("folderInput").value.trim();
+
+            if (!file || !folderName || !accessToken || !siteId || !driveId) {
+                document.getElementById("status").innerText = "❌ Please log in and fill out all fields.";
+                return;
+            }
+
+            const headers = {
+                Authorization: `Bearer ${accessToken}`,
+                "Content-Type": "application/json"
+            };
+
+            // Step 1: Create the folder if it doesn't exist
+            const folderUrl = `https://graph.microsoft.com/v1.0/drives/${driveId}/root/children`;
+            const folderPayload = {
+                name: folderName,
+                folder: {},
+                "@microsoft.graph.conflictBehavior": "replace"
+            };
+
+            await fetch(folderUrl, {
+                method: "POST",
+                headers,
+                body: JSON.stringify(folderPayload)
+            });
+
+            console.log(`📂 Folder '${folderName}' is ready.`);
+
+            // Step 2: Upload the file to that folder
+            const uploadUrl = `https://graph.microsoft.com/v1.0/drives/${driveId}/root:/${encodeURIComponent(folderName + "/" + file.name)}:/content`;
+
+            const uploadResp = await fetch(uploadUrl, {
+                method: "PUT",
+                headers: {
+                    Authorization: `Bearer ${accessToken}`
+                },
+                body: file
+            });
+
+            if (uploadResp.ok) {
+                document.getElementById("status").innerText = `✅ Uploaded to '${folderName}/${file.name}'`;
+                console.log(`✅ Success! Uploaded to '${folderName}/${file.name}'`);
+            } else {
+                const err = await uploadResp.text();
+                console.error("❌ Upload failed:", err);
+                document.getElementById("status").innerText = "❌ Upload failed.";
+            }
+        }
     function updateUploadButtonState() {
         uploadButton.disabled = !courseSelect.value || !fileInput.files.length;
     }
