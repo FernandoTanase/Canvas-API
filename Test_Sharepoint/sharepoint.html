@@ -2,6 +2,8 @@
 <html>
   <head>
     <meta charset="UTF-8" />
+    <link rel="stylesheet" href="popup.css">
+    <link href="https://fonts.googleapis.com/css2?family=Barlow&display=swap" rel="stylesheet">
     <title>Upload PDF to SharePoint using Microsoft Graph</title>
     <script src="msal-browser.min.js"></script>
   </head>
@@ -10,10 +12,11 @@
 
     <button onclick="signIn()">🔐 Sign in with Microsoft</button><br /><br />
 
-    <label
-      >Choose PDF:
-      <input type="file" id="fileInput" accept="application/pdf" /> </label
-    ><br /><br />
+    <label>Choose PDF:
+      <input type="file" id="fileInput" accept="application/pdf" />
+    </label>
+      <br />
+      <br />
 
     <!-- View Tab -->
     <div id="view-tab-content" class="tab-content">
