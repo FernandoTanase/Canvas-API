@@ -5,8 +5,11 @@ body {
 }
 
 h1 {
-    font-size: 20px;
+    font-size: 25px;
     margin-bottom: 10px;
+    font-family: 'Barlow', sans-serif;
+    font-weight: 900px;
+    margin-left: 60px;
 }
 
 h2 {
@@ -31,7 +34,7 @@ input[type="file"] {
 }
 
 button {
-    background-color: #4CAF50;
+    background-color: #e60000 ;
     color: white;
     border: none;
     padding: 10px;
@@ -51,16 +54,16 @@ button:disabled {
 }
 
 button:hover:not(:disabled) {
-    background-color: #45a049;
+    background-color: #000000;
 }
 
 .close-button {
-    background-color: #f44336;
+    background-color: #e60000 ;
     margin-top: 15px;
 }
 
 .close-button:hover {
-    background-color: #e53935;
+    background-color: #b30000;
 }
 
 #status-message {
@@ -70,8 +73,8 @@ button:hover:not(:disabled) {
 }
 
 .error {
-    background-color: #ffebee;
-    color: #c62828;
+    background-color: #e8f5e9;
+    color: #e60000;
 }
 
 .success {
