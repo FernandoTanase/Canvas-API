@@ -91,12 +91,17 @@
       <button id="share-button">Share</button>
     </div>
 
+
     <script>
+      const fileId = document.getElementById("file-select");
+      const folderId = document.getElementById("folder-select");
+      const email = document.getElementById("receiver");
+
       async function shareFileOrFolder(fileId, folderId, email) {
         try {
           const accessToken = await getAccessToken(); // Get the access token
-          let itemId;
-          let itemType;
+          let itemId = null;
+          let itemType = null;
 
           if (fileId) {
             itemId = fileId;
