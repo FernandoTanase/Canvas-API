@@ -113,45 +113,33 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Handle file upload
     uploadButton.addEventListener('click', async function() {
-        ...
+        if (!canvasApi) {
+            showStatus('Please set up API credentials first', 'error');
+            return;
+        }
+        
+        const courseId = courseSelect.value;
+        const file = fileInput.files[0];
+        
+        if (!courseId || !file) {
+            showStatus('Please select a course and a file', 'error');
+            return;
+        }
+        
         try {
             uploadButton.disabled = true;
             showStatus('Uploading file...', 'info');
-    
+            
             const result = await canvasApi.uploadFile(courseId, file, (progress) => {
                 showStatus(`Uploading: ${Math.round(progress)}%`, 'info');
             });
-    
+            
             showStatus('File uploaded successfully!', 'success');
             fileInput.value = ''; // Clear file input
             updateUploadButtonState();
-    
-            // ✅ Save file for SharePoint use
+
+            // Store the file
             uploadedFile = file;
-    
-            // ⬇️ INSERT SharePoint logic here
-            if (document.getElementById('share-point').checked && uploadedFile) {
-                try {
-                    showStatus('Uploading to SharePoint...', 'info');
-                    const formData = new FormData();
-                    formData.append('file', uploadedFile);
-                    formData.append('folder_name', document.getElementById('folder-name').value || 'Canvas_class');
-    
-                    const res = await fetch('http://127.0.0.1:5000/upload-to-sharepoint', {
-                        method: 'POST',
-                        body: formData
-                    });
-    
-                    const result = await res.json();
-                    if (res.ok) {
-                        showStatus('✅ SharePoint Upload: ' + result.message, 'success');
-                    } else {
-                        showStatus('❌ SharePoint Upload Failed: ' + result.error, 'error');
-                    }
-                } catch (err) {
-                    showStatus('❌ SharePoint Upload Error: ' + err.message, 'error');
-                }
-            }
     
         } catch (error) {
             console.error('Upload error:', error);
@@ -159,7 +147,7 @@ document.addEventListener('DOMContentLoaded', function() {
             uploadButton.disabled = false;
         }
     });
-    
+
     // Display File preview in the View File tab 
     const viewTabContent = document.getElementById('view-tab-content');
     
