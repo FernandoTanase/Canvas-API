@@ -15,13 +15,57 @@
       <input type="file" id="fileInput" accept="application/pdf" /> </label
     ><br /><br />
 
+    <!-- View Tab -->
+    <div id="view-tab-content" class="tab-content">
+      <h2>Uploaded File</h2>
+      <img
+        id="uploaded-image"
+        src=""
+        alt="No file uploaded yet"
+        style="max-width: 100%; display: none"
+      />
+    </div>
+
+    <script>
+      const viewTabContent = document.getElementById("view-tab-content");
+      fileInput.addEventListener("change", function (event) {
+        uploadedFile = event.target.files[0];
+        viewTabContent.innerHTML = "<h2>Uploaded File</h2>";
+        if (!uploadedFile) {
+          viewTabContent.innerHTML += "<p>No file has been uploaded yet.</p>";
+          return;
+        }
+        const fileType = uploadedFile.type;
+        if (fileType.startsWith("image/")) {
+          const img = document.createElement("img");
+          img.src = URL.createObjectURL(uploadedFile);
+          img.alt = uploadedFile.name;
+          img.style.maxWidth = "100%";
+          viewTabContent.appendChild(img);
+        } else if (uploadedFile.name.toLowerCase().endsWith(".pdf")) {
+          const obj = document.createElement("object");
+          obj.data = URL.createObjectURL(uploadedFile);
+          obj.type = "application/pdf";
+          obj.width = "100%";
+          obj.height = "500px";
+          viewTabContent.appendChild(obj);
+        } else if (fileType.startsWith("video/")) {
+          const video = document.createElement("video");
+          video.controls = true;
+          video.width = 320;
+          video.height = 240;
+          video.src = URL.createObjectURL(uploadedFile);
+          viewTabContent.appendChild(video);
+        } else {
+          viewTabContent.innerHTML +=
+            "<p>Preview not available for this file type.</p>";
+        }
+      });
+    </script>
+
     <label
       >Folder name (will be created if it doesn’t exist):
-      <input
-        type="text"
-        id="folderInput"
-        placeholder="CustomerFolder"
-      /> </label
+      <input type="text" id="folderInput" placeholder="Folder Name" /> </label
     ><br /><br />
 
     <button onclick="uploadToSharePoint()">📤 Upload PDF</button>
