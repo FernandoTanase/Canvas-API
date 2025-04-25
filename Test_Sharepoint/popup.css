@@ -7,12 +7,16 @@ body {
 h1 {
     font-size: 20px;
     margin-bottom: 10px;
+    font-weight:950px;
+    font-family: 'Barlow', sans-serif;
+    margin-left: 50px;
 }
 
 h2 {
     font-size: 16px;
     margin-top: 15px;
     margin-bottom: 10px;
+    margin-left: 30px;
     font-weight:950px;
     font-family: 'Barlow', sans-serif;
 }
