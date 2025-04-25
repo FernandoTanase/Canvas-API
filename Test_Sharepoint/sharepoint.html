@@ -91,6 +91,48 @@
       <button id="share-button">Share</button>
     </div>
 
+    <script>
+      async function shareFileOrFolder(fileId, folderId, email) {
+        try {
+          const accessToken = await getAccessToken(); // Get the access token
+          let itemId;
+          let itemType;
+
+          if (fileId) {
+            itemId = fileId;
+            itemType = "file";
+          } else if (folderId) {
+            itemId = folderId;
+            itemType = "folder";
+          } else {
+            showStatus("Please select a file or folder to share.", "error");
+            return;
+          }
+
+          const shareUrl = `https://graph.microsoft.com/v1.0/me/drive/items/${itemId}/createLink`; // The createLink API
+
+          const sharePayload = {
+            type: "edit",
+            scope: "anyone",
+            recipients: [{ email }],
+          };
+
+          const shareResponse = await fetch(shareUrl, {
+            method: "POST", //  Use POST to create the link
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(sharePayload), //  Send the sharing details in the body
+          });
+
+          //  ... (Error handling and response processing)
+        } catch (error) {
+          //  ... (Error handling)
+        }
+      }
+    </script>
+
     <p id="status"></p>
 
     <script>
