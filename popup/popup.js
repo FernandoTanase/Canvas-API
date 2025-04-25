@@ -1,3 +1,4 @@
+// === popup.js ===
 document.addEventListener("DOMContentLoaded", function () {
   const closeButton = document.getElementById("close-button");
   const saveSettingsButton = document.getElementById("save-settings");
@@ -80,7 +81,111 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // Enable/disable upload button based on selections
+  const clientId = "42d4bf53-30f7-4522-ba5e-83a5dff792d6";
+  const tenantId = "2b30530b-69b6-4457-b818-481cb53d42ae";
+  const sharepointSite = "luky.sharepoint.com";
+  const sitePath = "/sites/CS498T1";
+
+  let accessToken = "";
+  let siteId = "";
+  let driveId = "";
+
+  const msalConfig = {
+    auth: {
+      clientId,
+      authority: `https://login.microsoftonline.com/${tenantId}`,
+    },
+  };
+
+  async function signIn() {
+    try {
+      const result = await msalInstance.loginPopup({
+        scopes: ["Files.ReadWrite.All", "Sites.ReadWrite.All"],
+      });
+      const token = await msalInstance.acquireTokenSilent({
+        scopes: ["Files.ReadWrite.All", "Sites.ReadWrite.All"],
+        account: result.account,
+      });
+
+      accessToken = token.accessToken;
+      document.getElementById("status").innerText = "✅ Logged in!";
+      await getSiteAndDriveIds();
+    } catch (err) {
+      console.error("Login error:", err);
+      document.getElementById("status").innerText = "❌ Login failed.";
+    }
+  }
+
+  async function getSiteAndDriveIds() {
+    const headers = { Authorization: `Bearer ${accessToken}` };
+    const siteResp = await fetch(
+      `https://graph.microsoft.com/v1.0/sites/${sharepointSite}:${sitePath}`,
+      { headers }
+    );
+    siteId = (await siteResp.json()).id;
+
+    const driveResp = await fetch(
+      `https://graph.microsoft.com/v1.0/sites/${siteId}/drive`,
+      { headers }
+    );
+    driveId = (await driveResp.json()).id;
+  }
+
+  async function uploadToSharePoint() {
+    const file = document.getElementById("fileInput").files[0];
+    const folderName = document.getElementById("folderInput").value.trim();
+
+    if (!file || !folderName || !accessToken || !siteId || !driveId) {
+      document.getElementById("status").innerText =
+        "❌ Please log in and fill out all fields.";
+      return;
+    }
+
+    const headers = {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+    };
+
+    // Step 1: Create the folder if it doesn't exist
+    const folderUrl = `https://graph.microsoft.com/v1.0/drives/${driveId}/root/children`;
+    const folderPayload = {
+      name: folderName,
+      folder: {},
+      "@microsoft.graph.conflictBehavior": "replace",
+    };
+
+    await fetch(folderUrl, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(folderPayload),
+    });
+
+    console.log(`📂 Folder '${folderName}' is ready.`);
+
+    // Step 2: Upload the file to that folder
+    const uploadUrl = `https://graph.microsoft.com/v1.0/drives/${driveId}/root:/${encodeURIComponent(
+      folderName + "/" + file.name
+    )}:/content`;
+
+    const uploadResp = await fetch(uploadUrl, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: file,
+    });
+
+    if (uploadResp.ok) {
+      document.getElementById(
+        "status"
+      ).innerText = `✅ Uploaded to '${folderName}/${file.name}'`;
+      console.log(`✅ Success! Uploaded to '${folderName}/${file.name}'`);
+    } else {
+      const err = await uploadResp.text();
+      console.error("❌ Upload failed:", err);
+      document.getElementById("status").innerText = "❌ Upload failed.";
+    }
+  }
   function updateUploadButtonState() {
     uploadButton.disabled = !courseSelect.value || !fileInput.files.length;
   }
@@ -212,3 +317,71 @@ document.addEventListener("DOMContentLoaded", function () {
     window.close();
   });
 });
+
+// === SharePoint Helper Functions ===
+
+async function getSharePointAccessToken() {
+  const msalConfig = {
+    auth: {
+      clientId: "42d4bf53-30f7-4522-ba5e-83a5dff792d6",
+      authority:
+        "https://login.microsoftonline.com/2b30530b-69b6-4457-b818-481cb53d42ae",
+    },
+  };
+  const msalInstance = new msal.PublicClientApplication(msalConfig);
+  const loginResponse = await msalInstance.loginPopup({
+    scopes: ["Sites.ReadWrite.All", "Files.ReadWrite.All"],
+  });
+  const tokenResponse = await msalInstance.acquireTokenSilent({
+    scopes: ["Sites.ReadWrite.All", "Files.ReadWrite.All"],
+    account: loginResponse.account,
+  });
+  return tokenResponse.accessToken;
+}
+
+async function getSharePointDriveId(token) {
+  const siteResp = await fetch(
+    "https://graph.microsoft.com/v1.0/sites/luky.sharepoint.com:/sites/CS498T1",
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  const siteId = (await siteResp.json()).id;
+
+  const driveResp = await fetch(
+    `https://graph.microsoft.com/v1.0/sites/${siteId}/drive`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return (await driveResp.json()).id;
+}
+
+async function createSharePointFolderIfNotExists(driveId, folderName, token) {
+  await fetch(
+    `https://graph.microsoft.com/v1.0/drives/${driveId}/root/children`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name: folderName,
+        folder: {},
+        "@microsoft.graph.conflictBehavior": "replace",
+      }),
+    }
+  );
+}
+
+async function uploadFileToSharePoint(driveId, folderName, file, token) {
+  const uploadUrl = `https://graph.microsoft.com/v1.0/drives/${driveId}/root:/${encodeURIComponent(
+    folderName + "/" + file.name
+  )}:/content`;
+  await fetch(uploadUrl, {
+    method: "PUT",
+    headers: { Authorization: `Bearer ${token}` },
+    body: file,
+  });
+}
